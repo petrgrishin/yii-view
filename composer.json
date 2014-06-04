@@ -25,5 +25,13 @@
         "psr-4": {
             "PetrGrishin\\View\\": "src/"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PetrGrishin\\View\\": "src/"
+        },
+        "files": [
+            "vendor/yiisoft/yii/framework/YiiBase.php"
+        ]
     }
 }
