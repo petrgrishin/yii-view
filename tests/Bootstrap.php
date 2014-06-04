@@ -17,3 +17,8 @@ class Yii extends YiiBase {
         return @call_user_func_array(array(get_parent_class(), 'import'), $arguments) ? : $arguments[0];
     }
 }
+
+Yii::createWebApplication(array(
+    'basePath' => './tests',
+    'viewPath' => './tests/view',
+));

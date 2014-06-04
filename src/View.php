@@ -8,5 +8,8 @@ namespace PetrGrishin\View;
 
 class View {
 
+    public static function className() {
+        return get_called_class();
+    }
 }
  

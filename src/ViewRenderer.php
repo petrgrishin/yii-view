@@ -11,6 +11,10 @@ use IViewRenderer;
 
 class ViewRenderer extends CApplicationComponent implements IViewRenderer {
 
+    public static function className() {
+        return get_called_class();
+    }
+
     public function renderFile($context, $sourceFile, $data, $return) {
 
     }
