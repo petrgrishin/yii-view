@@ -17,6 +17,8 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
     }
 
     public function renderFile($context, $sourceFile, $data, $return) {
-
+        $view = new View();
+        $view->setParams($data);
+        return $view->render($sourceFile, $return);
     }
 }
