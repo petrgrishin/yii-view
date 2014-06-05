@@ -6,7 +6,7 @@
 class ViewTest extends PHPUnit_Framework_TestCase {
     const VIEW_RENDERER_NAME = 'viewRenderer';
     public function test() {
-        $viewRenderer = $this->getViewRenderer();
+        $this->getViewRenderer();
 
         $controller = new TestController('test', $this->getApp());
         $this->getApp()->setController($controller);
