@@ -9,4 +9,4 @@ $this->widget(TestWidget::className(), 'test');
 $this->widget(TestWidget::className(), 'test2');
 
 var_export($this->getParams());
-var_export($this->getWidgets());
+var_dump($this->getWidgets());

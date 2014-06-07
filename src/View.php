@@ -34,11 +34,11 @@ class View {
         if (!array_key_exists($className, $this->widgets)) {
             $this->widgets[$className] = array();
         }
-        $this->widgets[$className][] = array(
-            'name' => $name,
-            'params' => $params,
-        );
-        return $this->context->widget($className, $params);
+        /** @var \PetrGrishin\View\Widget $widget */
+        $widget = $this->context->widget($className, $params);
+        $widget->setName($name);
+        $this->widgets[$className][] = $widget;
+        return $widget;
     }
 
     public function getWidgets() {
