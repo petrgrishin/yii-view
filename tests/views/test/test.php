@@ -5,8 +5,7 @@
 
 /** @var \PetrGrishin\View\View $this */
 
-$this->widget(TestWidget::className(), 'test');
-$this->widget(TestWidget::className(), 'test2');
+$this->widget(TestWidget::className(), 'test')->run();
+$this->widget(TestWidget::className(), 'test2')->run();
 
-var_export($this->getParams());
-var_dump($this->getWidgets());
+printf("View template\n");

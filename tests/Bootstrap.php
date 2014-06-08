@@ -4,6 +4,7 @@
  */
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/widget/TestWidget.php';
+require_once __DIR__ . '/widget/InnerWidget.php';
 
 class Yii extends YiiBase {
     /**
