@@ -7,6 +7,8 @@ namespace PetrGrishin\View;
 
 
 class View {
+    /** @var string */
+    protected $id;
     /** @var array() */
     protected $params = array();
     /** @var \CBaseController */
@@ -21,7 +23,12 @@ class View {
     }
 
     public function __construct($context) {
+        $this->id = spl_object_hash($this);
         $this->context = $context;
+    }
+
+    public function getId() {
+        return $this->id;
     }
 
     public function getParams() {

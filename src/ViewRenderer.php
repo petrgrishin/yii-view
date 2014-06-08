@@ -13,6 +13,8 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
     public $fileExtension = '.php';
     public $fileExtensionJs = '.js';
 
+    private $registerScript = array();
+
     public static function className() {
         return get_called_class();
     }
@@ -25,7 +27,7 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
         $view->setParams($params);
         $view->setScriptFile($this->getScriptFile($sourceFile));
         $response = $view->render($sourceFile, $isReturn);
-        $this->processorWidgetScript($view->getWidgets());
+        $this->processorScript($view);
         return $response;
     }
 
@@ -37,13 +39,28 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
         return substr($sourceFile, 0, - strlen($this->fileExtension));
     }
 
-    public function processorWidgetScript($widgetsPoll) {
-        foreach ($widgetsPoll as $widgetClass => $widgets) {
+    /**
+     * @param \PetrGrishin\View\View $view
+     */
+    public function processorScript($view) {
+        $widgetsIds = array();
+        foreach (array_reverse($view->getWidgets()) as $widgetClass => $widgets) {
             /** @var \PetrGrishin\View\Widget $widget */
             foreach ($widgets as $widget) {
-                printf("Script file: %s\n", $widget->getView()->getScriptFile());
+                printf("App.register('%s', '%s');\n", $widget->getView()->getId(), $widget->getView()->getScriptFile());
+                $widgetsIds[$widget->getName()] = $widget->getView()->getId();
             }
         }
+        printf("App.register('%s', '%s');\n", $view->getId(), $view->getScriptFile());
+        printf("App.do('%s', %s);\n", $view->getId(), json_encode($widgetsIds));
+    }
+
+    public function registerScript($id, $fileScript) {
+        if (!array_key_exists($id, $this->registerScript)) {
+            $this->registerScript[$id] = $fileScript;
+            printf("App.register('%s', '%s');\n", $id, $fileScript);
+        }
+        return $this;
     }
 
 }
