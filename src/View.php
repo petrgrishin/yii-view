@@ -13,6 +13,8 @@ class View {
     protected $context;
     /** @var array() */
     protected $widgets = array();
+    /** @var string */
+    protected $scriptFile;
 
     public static function className() {
         return get_called_class();
@@ -30,12 +32,21 @@ class View {
         $this->params = $values;
     }
 
+    public function getScriptFile() {
+        return $this->scriptFile;
+    }
+
+    public function setScriptFile($scriptFile) {
+        $this->scriptFile = $scriptFile;
+        return $this;
+    }
+
     public function widget($className, $name, $params = array()) {
         if (!array_key_exists($className, $this->widgets)) {
             $this->widgets[$className] = array();
         }
         /** @var \PetrGrishin\View\Widget $widget */
-        $widget = $this->context->widget($className, $params);
+        $widget = $this->context->createWidget($className, $params);
         $widget->setName($name);
         $this->widgets[$className][] = $widget;
         return $widget;

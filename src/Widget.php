@@ -11,14 +11,14 @@ class Widget extends \CWidget {
     private $name;
 
     /**
-     * @return mixed
+     * @return \PetrGrishin\View\View
      */
     public function getView() {
         return $this->view;
     }
 
     /**
-     * @param mixed $view
+     * @param \PetrGrishin\View\View $view
      * @return $this
      */
     public function setView($view) {
