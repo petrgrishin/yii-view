@@ -9,11 +9,13 @@ namespace PetrGrishin\View;
 class View {
     /** @var string */
     protected $id;
-    /** @var array() */
+    /** @var array */
     protected $params = array();
+    /** @var array */
+    protected $jsParams = array();
     /** @var \CBaseController */
     protected $context;
-    /** @var array() */
+    /** @var array */
     protected $widgets = array();
     /** @var string */
     protected $scriptFile;
@@ -37,6 +39,15 @@ class View {
 
     public function setParams($values) {
         $this->params = $values;
+    }
+
+    public function getJsParams() {
+        return $this->jsParams;
+    }
+
+    public function setJsParams($jsParams) {
+        $this->jsParams = $jsParams;
+        return $this;
     }
 
     public function getScriptFile() {
