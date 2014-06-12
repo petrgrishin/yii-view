@@ -12,8 +12,8 @@ use IViewRenderer;
 class ViewRenderer extends CApplicationComponent implements IViewRenderer {
     public $fileExtension = '.php';
     public $fileExtensionJs = '.js';
-
-    private $registerScript = array();
+    public $scriptProcessorClass;
+    private $_scriptProcessor;
 
     public static function className() {
         return get_called_class();
@@ -27,7 +27,7 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
         $view->setParams($params);
         $view->setScriptFile($this->getScriptFile($sourceFile));
         $response = $view->render($sourceFile, $isReturn);
-        $this->processorScript($view);
+        $this->getScriptProcessor()->processView($view);
         return $response;
     }
 
@@ -40,27 +40,13 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
     }
 
     /**
-     * @param \PetrGrishin\View\View $view
+     * @return \PetrGrishin\View\ViewScriptProcessor
      */
-    public function processorScript($view) {
-        $widgetsIds = array();
-        foreach (array_reverse($view->getWidgets()) as $widgetClass => $widgets) {
-            /** @var \PetrGrishin\View\Widget $widget */
-            foreach ($widgets as $widget) {
-                printf("App.register('%s', '%s');\n", $widget->getView()->getId(), $widget->getView()->getScriptFile());
-                $widgetsIds[$widget->getName()] = $widget->getView()->getId();
-            }
+    public function getScriptProcessor() {
+        if (empty($this->_scriptProcessor)) {
+            $scriptProcessorClass = $this->scriptProcessorClass ?: ViewScriptProcessor::className();
+            $this->_scriptProcessor = new $scriptProcessorClass();
         }
-        printf("App.register('%s', '%s');\n", $view->getId(), $view->getScriptFile());
-        printf("App.do('%s', %s);\n", $view->getId(), json_encode($widgetsIds));
+        return $this->_scriptProcessor;
     }
-
-    public function registerScript($id, $fileScript) {
-        if (!array_key_exists($id, $this->registerScript)) {
-            $this->registerScript[$id] = $fileScript;
-            printf("App.register('%s', '%s');\n", $id, $fileScript);
-        }
-        return $this;
-    }
-
 }
