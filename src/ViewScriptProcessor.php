@@ -35,13 +35,13 @@ class ViewScriptProcessor extends \CApplicationComponent {
         if (!$script) {
             return false;
         }
-        $this->getClientScript()->registerScript($id . '_append', sprintf("App.register('%s', %s);", $id, $script), CClientScript::POS_HEAD);
+        $this->getClientScript()->registerScript($id . '_append', sprintf("App.register('%s', %s);", $id, $script), CClientScript::POS_END);
         return true;
     }
 
     public function runScript($id, $widgetsIds) {
         $script = sprintf("App.run('%s', %s);", $id, json_encode($widgetsIds));
-        $this->getClientScript()->registerScript($id . '_run', $script, CClientScript::POS_HEAD);
+        $this->getClientScript()->registerScript($id . '_run', $script, CClientScript::POS_END);
     }
 
     /**

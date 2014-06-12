@@ -1,5 +1,3 @@
-(function() {
-    return function (params, scope, widgets) {
+function (params, scope, widgets) {
 
-    };
-})()
+}
