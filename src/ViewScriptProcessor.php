@@ -15,16 +15,26 @@ class ViewScriptProcessor extends \CApplicationComponent {
     }
 
     public function processView(View $view) {
+
+        $widgetsIds = $this->getDependents($view);
+        $isAppend = $this->appendScriptFile($view->getId(), $view->getScriptFile());
+        $isAppend && $this->runScript($view->getId(), $view->getJsParams() , $widgetsIds);
+    }
+
+    public function getDependents(View $view) {
         $widgetsIds = array();
         foreach (array_reverse($view->getWidgets()) as $widgetClass => $widgets) {
             /** @var \PetrGrishin\View\Widget $widget */
             foreach ($widgets as $widget) {
                 $this->appendScriptFile($widget->getView()->getId(), $widget->getView()->getScriptFile());
-                $widgetsIds[$widget->getName()] = $widget->getView()->getId();
+                $widgetsIds[$widget->getName()] = array(
+                    'name' => $widget->getView()->getId(),
+                    'params' => $widget->getView()->getJsParams(),
+                    'dependents' => $this->getDependents($widget->getView()),
+                );
             }
         }
-        $isAppend = $this->appendScriptFile($view->getId(), $view->getScriptFile());
-        $isAppend && $this->runScript($view->getId(), $widgetsIds);
+        return $widgetsIds;
     }
 
     public function appendScriptFile($id, $fileScript) {
@@ -39,8 +49,8 @@ class ViewScriptProcessor extends \CApplicationComponent {
         return true;
     }
 
-    public function runScript($id, $widgetsIds) {
-        $script = sprintf("App.run('%s', %s);", $id, json_encode($widgetsIds));
+    public function runScript($id, $jsParams, $widgetsIds) {
+        $script = sprintf("App.run('%s', %s, %s);", $id, json_encode($jsParams), json_encode($widgetsIds));
         $this->getClientScript()->registerScript($id . '_run', $script, CClientScript::POS_END);
     }
 

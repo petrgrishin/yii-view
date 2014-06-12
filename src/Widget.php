@@ -10,6 +10,10 @@ class Widget extends \CWidget {
     private $view;
     private $name;
 
+    public static function className() {
+        return get_called_class();
+    }
+
     /**
      * @return \PetrGrishin\View\View
      */
