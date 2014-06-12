@@ -21,7 +21,7 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
 
     public function renderFile($context, $sourceFile, $params, $isReturn) {
         $view = new View($context);
-        if ($context instanceof \PetrGrishin\View\Widget) {
+        if ($context instanceof Widget) {
             $context->setView($view);
         }
         $view->setParams($params);

@@ -15,19 +15,19 @@ class ViewScriptProcessor extends \CApplicationComponent {
     }
 
     public function processView(View $view) {
-
         $widgetsIds = $this->getDependents($view);
         $isAppend = $this->appendScriptFile($view->getId(), $view->getScriptFile());
-        $isAppend && $this->runScript($view->getId(), $view->getJsParams() , $widgetsIds);
+        $run = !$view->getContext() instanceof Widget;
+        $run && $isAppend && $this->runScript($view->getId(), $view->getJsParams() , $widgetsIds);
     }
 
     public function getDependents(View $view) {
         $widgetsIds = array();
         foreach (array_reverse($view->getWidgets()) as $widgetClass => $widgets) {
-            /** @var \PetrGrishin\View\Widget $widget */
+            /** @var Widget $widget */
             foreach ($widgets as $widget) {
-                $this->appendScriptFile($widget->getView()->getId(), $widget->getView()->getScriptFile());
-                $widgetsIds[$widget->getName()] = array(
+                $isAppend = $this->appendScriptFile($widget->getView()->getId(), $widget->getView()->getScriptFile());
+                $isAppend && $widgetsIds[$widget->getName()] = array(
                     'name' => $widget->getView()->getId(),
                     'params' => $widget->getView()->getJsParams(),
                     'dependents' => $this->getDependents($widget->getView()),

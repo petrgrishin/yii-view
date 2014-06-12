@@ -33,6 +33,10 @@ class View {
         return $this->id;
     }
 
+    public function getContext() {
+        return $this->context;
+    }
+
     public function getParams() {
         return $this->params;
     }

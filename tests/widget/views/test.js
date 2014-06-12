@@ -1,3 +1,3 @@
 function (params, scope, widgets) {
-    //inner
+    //test
 }
