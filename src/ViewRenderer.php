@@ -26,9 +26,20 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
         }
         $view->setParams($params);
         $view->setScriptFile($this->getScriptFile($sourceFile));
-        $response = $view->render($sourceFile, $isReturn);
-        $this->getScriptProcessor()->processView($view);
-        return $response;
+        if ($this->isAjaxRequest()) {
+            $this->renderAjax($view, $sourceFile);
+            return null;
+        } else {
+            $response = $view->render($sourceFile, $isReturn);
+            $this->getScriptProcessor()->processView($view);
+            return $response;
+        }
+    }
+
+    public function renderAjax(View $view, $sourceFile) {
+        echo json_encode(array(
+            'content' => $view->render($sourceFile, true),
+        ));
     }
 
     public function getScriptFile($sourceFile) {
@@ -48,5 +59,26 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
             $this->_scriptProcessor = new $scriptProcessorClass();
         }
         return $this->_scriptProcessor;
+    }
+
+    /**
+     * @return \CApplication
+     */
+    protected function getApp() {
+        return \Yii::app();
+    }
+
+    /**
+     * @return \CHttpRequest
+     */
+    protected function getRequest() {
+        return $this->getApp()->getRequest();
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isAjaxRequest() {
+        return $this->getRequest()->getIsAjaxRequest();
     }
 }
