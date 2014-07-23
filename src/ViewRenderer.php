@@ -28,18 +28,18 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
         $view->setParams($params);
         $view->setScriptFile($this->getScriptFile($sourceFile));
         if ($this->isAjaxRequest()) {
-            $this->renderAjax($view, $sourceFile);
-            return null;
+            $response = $this->renderAjax($view, $sourceFile);
         } else {
             $response = $view->render($sourceFile, $isReturn);
             $this->getScriptProcessor()->processView($view);
-            return $response;
         }
+        return $response;
     }
 
     public function renderAjax(View $view, $sourceFile) {
-        echo json_encode(array(
+        return json_encode(array(
             'content' => $view->render($sourceFile, true),
+            'dependents' => $this->getScriptProcessor()->getDependents($view),
         ));
     }
 
