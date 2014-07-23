@@ -9,6 +9,8 @@ namespace PetrGrishin\View;
 use CClientScript;
 
 class ViewScriptProcessor extends \CApplicationComponent {
+    private $assertPath;
+    private $publicPath;
 
     public static function className() {
         return get_called_class();
@@ -41,11 +43,11 @@ class ViewScriptProcessor extends \CApplicationComponent {
         if (!file_exists($fileScript)) {
             return false;
         }
-        $script = trim(file_get_contents($fileScript));
-        if (!$script) {
+        $prepareScriptFile = $this->prepareScriptFile($id, $fileScript);
+        if (false === $prepareScriptFile) {
             return false;
         }
-        $this->getClientScript()->registerScript($id . '_append', sprintf("App.register('%s', %s);", $id, $script), CClientScript::POS_END);
+        $this->getClientScript()->registerScriptFile($prepareScriptFile, CClientScript::POS_END);
         return true;
     }
 
@@ -54,11 +56,76 @@ class ViewScriptProcessor extends \CApplicationComponent {
         $this->getClientScript()->registerScript($id . '_run', $script, CClientScript::POS_END);
     }
 
+    protected function prepareScriptFile($id, $fileScript) {
+        $script = trim(file_get_contents($fileScript));
+        if (!$script) {
+            return false;
+        }
+        $tempFile = $this->generateAbsoluteAssertPath($id);
+        $content = sprintf("App.register('%s', %s);", $id, $script);
+        if (false === file_put_contents($tempFile, $content)) {
+            throw new \Exception('File `%s` do not save', $tempFile);
+        }
+        return $this->generateAssertPath($id);
+    }
+
+    public function getAssertPath() {
+        return $this->assertPath ?: 'assets';
+    }
+
+    public function setAssertPath($assertPath) {
+        $this->assertPath = $assertPath;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPublicPath() {
+        return $this->publicPath ?: \Yii::getPathOfAlias('webroot');
+    }
+
+    /**
+     * @param mixed $publicPath
+     * @return $this
+     */
+    public function setPublicPath($publicPath) {
+        $this->publicPath = $publicPath;
+        return $this;
+    }
+
+    protected function getAbsoluteAssertPath() {
+        $path = sprintf('%s/%s', $this->getPublicPath(), $this->getAssertPath());
+        if (false === is_dir($path) && false === mkdir($path, 0777, true)) {
+            throw new \Exception(sprintf('Do not create directory `%s`', $path));
+        }
+        if (false === is_dir($path) || false === is_writable($path)) {
+            throw new \Exception(sprintf('No write access to directory `%s`', $path));
+        }
+        return $path;
+    }
+
     /**
      * @return CClientScript
      */
     protected function getClientScript() {
         return \Yii::app()->getComponent('clientScript');
+    }
+
+    /**
+     * @param $id
+     * @return string
+     */
+    protected function generateAbsoluteAssertPath($id) {
+        return sprintf('%s/%s', $this->getAbsoluteAssertPath(), $this->generateAssertScriptFileName($id));
+    }
+
+    protected function generateAssertPath($id) {
+        return sprintf('/%s/%s', $this->getAssertPath(), $this->generateAssertScriptFileName($id));
+    }
+
+    protected function generateAssertScriptFileName($id) {
+        return sprintf('%s.js', $id);
     }
 }
  

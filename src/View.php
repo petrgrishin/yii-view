@@ -24,8 +24,8 @@ class View {
         return get_called_class();
     }
 
-    public function __construct($context) {
-        $this->id = spl_object_hash($this);
+    public function __construct($id, $context) {
+        $this->id = $id;
         $this->context = $context;
     }
 

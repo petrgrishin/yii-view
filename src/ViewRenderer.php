@@ -20,7 +20,8 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
     }
 
     public function renderFile($context, $sourceFile, $params, $isReturn) {
-        $view = new View($context);
+        $hashId = $this->generateHash($sourceFile);
+        $view = new View($hashId, $context);
         if ($context instanceof Widget) {
             $context->setView($view);
         }
@@ -80,5 +81,13 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
      */
     protected function isAjaxRequest() {
         return $this->getRequest()->getIsAjaxRequest();
+    }
+
+    /**
+     * @param $sourceFile
+     * @return string
+     */
+    protected function generateHash($sourceFile) {
+        return sprintf('%x', crc32($sourceFile));
     }
 }

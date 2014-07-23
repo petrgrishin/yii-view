@@ -23,4 +23,7 @@ class Yii extends YiiBase {
 Yii::createWebApplication(array(
     'basePath' => './tests',
     'viewPath' => './tests/views',
+    'aliases' => array(
+        'webroot' => './tests',
+    )
 ));
