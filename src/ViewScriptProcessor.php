@@ -9,6 +9,8 @@ namespace PetrGrishin\View;
 use CClientScript;
 
 class ViewScriptProcessor extends \CApplicationComponent {
+    const MARKER_ID = '{{id}}';
+
     private $assertPath;
     private $publicPath;
 
@@ -62,7 +64,7 @@ class ViewScriptProcessor extends \CApplicationComponent {
             return false;
         }
         $tempFile = $this->generateAbsoluteAssertPath($id);
-        $content = sprintf("App.register('%s', %s);", $id, $script);
+        $content = str_replace(self::MARKER_ID, $id, $script);
         if (false === file_put_contents($tempFile, $content)) {
             throw new \Exception('File `%s` do not save', $tempFile);
         }

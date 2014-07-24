@@ -1,3 +1,3 @@
-function (params, scope, widgets) {
+App.register('{{id}}', function (params, scope, widgets) {
     //test
-}
+});
