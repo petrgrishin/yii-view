@@ -72,7 +72,7 @@ class ViewScriptProcessor extends \CApplicationComponent {
     }
 
     public function getAssertPath() {
-        return $this->assertPath ?: 'assets';
+        return $this->assertPath ?: 'assets/scripts';
     }
 
     public function setAssertPath($assertPath) {
