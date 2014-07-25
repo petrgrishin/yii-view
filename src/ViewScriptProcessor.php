@@ -49,7 +49,6 @@ class ViewScriptProcessor extends \CApplicationComponent {
         if (false === $prepareScriptFile) {
             return false;
         }
-        $this->getClientScript()->registerScriptFile($prepareScriptFile, CClientScript::POS_END);
         return true;
     }
 
