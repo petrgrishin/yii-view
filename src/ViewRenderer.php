@@ -29,6 +29,7 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
         $view->setScriptFile($this->getScriptFile($sourceFile));
         if ($this->isAjaxRequest()) {
             $response = $this->renderAjax($view, $sourceFile);
+            $this->getScriptProcessor()->processView($view, true);
         } else {
             $response = $view->render($sourceFile, $isReturn);
             $this->getScriptProcessor()->processView($view);
@@ -39,6 +40,8 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
     public function renderAjax(View $view, $sourceFile) {
         return json_encode(array(
             'content' => $view->render($sourceFile, true),
+            'name' => $view->getId(),
+            'params' => $view->getJsParams(),
             'dependents' => $this->getScriptProcessor()->getDependents($view),
         ));
     }

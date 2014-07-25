@@ -18,9 +18,12 @@ class ViewScriptProcessor extends \CApplicationComponent {
         return get_called_class();
     }
 
-    public function processView(View $view) {
+    public function processView(View $view, $ajax = false) {
         $widgetsIds = $this->getDependents($view);
         $isAppend = $this->appendScriptFile($view->getId(), $view->getScriptFile());
+        if ($ajax) {
+            return;
+        }
         $run = !$view->getContext() instanceof Widget;
         $run && $isAppend && $this->runScript($view->getId(), $view->getJsParams() , $widgetsIds);
     }
