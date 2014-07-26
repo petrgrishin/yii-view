@@ -8,6 +8,7 @@ namespace PetrGrishin\View;
 
 use CApplicationComponent;
 use IViewRenderer;
+use PetrGrishin\Widget\Widget;
 
 class ViewRenderer extends CApplicationComponent implements IViewRenderer {
     public $fileExtension = '.php';
@@ -20,8 +21,8 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
     }
 
     public function renderFile($context, $sourceFile, $params, $isReturn) {
-        $hashId = $this->generateHash($sourceFile);
-        $view = new View($hashId, $context);
+        $viewId = $this->generateViewId($sourceFile);
+        $view = new View($viewId, $context);
         if ($context instanceof Widget) {
             $context->setView($view);
         }
@@ -90,7 +91,7 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
      * @param $sourceFile
      * @return string
      */
-    protected function generateHash($sourceFile) {
-        return sprintf('%x', crc32($sourceFile));
+    protected function generateViewId($sourceFile) {
+        return sprintf('%s', sha1($sourceFile));
     }
 }

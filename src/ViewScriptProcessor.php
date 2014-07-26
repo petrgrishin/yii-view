@@ -7,6 +7,7 @@ namespace PetrGrishin\View;
 
 
 use CClientScript;
+use PetrGrishin\Widget\Widget;
 
 class ViewScriptProcessor extends \CApplicationComponent {
     const MARKER_ID = '{{id}}';
