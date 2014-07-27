@@ -6,11 +6,13 @@
 namespace PetrGrishin\View;
 
 
+use PetrGrishin\ArrayAccess\ArrayAccess;
+
 class View {
     /** @var string */
     protected $id;
-    /** @var array */
-    protected $params = array();
+    /** @var ArrayAccess */
+    protected $params;
     /** @var array */
     protected $jsParams = array();
     /** @var \CBaseController */
@@ -27,6 +29,7 @@ class View {
     public function __construct($id, $context) {
         $this->id = $id;
         $this->context = $context;
+        $this->params = ArrayAccess::create();
     }
 
     public function getId() {
@@ -38,11 +41,21 @@ class View {
     }
 
     public function getParams() {
-        return $this->params;
+        return $this->params->getArray();
     }
 
     public function setParams($values) {
-        $this->params = $values;
+        $this->params->setArray($values);
+        return $this;
+    }
+
+    public function setParam($path, $value) {
+        $this->params->setValue($path, $value);
+        return $this;
+    }
+
+    public function getParam($path, $defaultValue = null) {
+        return $this->params->getValue($path, $defaultValue);
     }
 
     public function getJsParams() {
