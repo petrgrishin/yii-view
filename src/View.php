@@ -7,6 +7,7 @@ namespace PetrGrishin\View;
 
 
 use PetrGrishin\ArrayAccess\ArrayAccess;
+use PetrGrishin\UniqueIdentifier\UniqueIdentifier;
 
 class View {
     /** @var string */
@@ -21,6 +22,8 @@ class View {
     protected $widgets = array();
     /** @var string */
     protected $scriptFile;
+    /** @var \PetrGrishin\UniqueIdentifier\UniqueIdentifier */
+    protected $uniqueIdentifier;
 
     public static function className() {
         return get_called_class();
@@ -30,6 +33,7 @@ class View {
         $this->id = $id;
         $this->context = $context;
         $this->params = ArrayAccess::create();
+        $this->uniqueIdentifier = UniqueIdentifier::create($id);
     }
 
     public function getId() {
@@ -85,6 +89,14 @@ class View {
         $widget->setName($name);
         $this->widgets[$className][] = $widget;
         return $widget;
+    }
+
+    public function getUniqueIdentifier($name) {
+        return $this->uniqueIdentifier->getUniqueIdentifier($name);
+    }
+
+    public function getIteratedUniqueIdentifier($name) {
+        return $this->uniqueIdentifier->getIteratedUniqueIdentifier($name);
     }
 
     /**

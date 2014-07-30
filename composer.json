@@ -6,7 +6,8 @@
         "php": ">=5.3.0",
         "yiisoft/yii": "*",
         "petrgrishin/yii-widget": "~1.0",
-        "petrgrishin/array-access": "~2.0"
+        "petrgrishin/array-access": "~2.0",
+        "petrgrishin/yii-unique-identifier": "dev-master"
     },
     "require-dev": {
         "league/phpunit-coverage-listener": "~1.0"
