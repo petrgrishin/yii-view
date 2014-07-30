@@ -33,7 +33,7 @@ class View {
         $this->id = $id;
         $this->context = $context;
         $this->params = ArrayAccess::create();
-        $this->uniqueIdentifier = UniqueIdentifier::create($id);
+        $this->uniqueIdentifier = UniqueIdentifier::create(sprintf('uid_%s', $id));
     }
 
     public function getId() {
