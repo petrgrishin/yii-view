@@ -23,12 +23,10 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
     public function renderFile($context, $sourceFile, $params, $isReturn) {
         $viewId = $this->generateViewId($sourceFile);
         $view = new View($viewId, $context);
-        if ($context instanceof Widget) {
-            $context->setView($view);
-        }
+        $isContextWidget = $this->isContextWidget($context) && $context->setView($view);
         $view->setParams($params);
         $view->setScriptFile($this->getScriptFile($sourceFile));
-        if ($this->isAjaxRequest()) {
+        if (!$isContextWidget && $this->isAjaxRequest()) {
             $response = $this->renderAjax($view, $sourceFile);
             $this->getScriptProcessor()->processView($view, true);
         } else {
@@ -85,6 +83,10 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
      */
     protected function isAjaxRequest() {
         return $this->getRequest()->getIsAjaxRequest();
+    }
+
+    protected function isContextWidget($context) {
+        return $context instanceof Widget;
     }
 
     /**
