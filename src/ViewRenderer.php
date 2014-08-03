@@ -37,6 +37,8 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
     }
 
     public function renderAjax(View $view, $sourceFile) {
+        // todo: load scriptsFiles
+        $this->getClientScript()->reset();
         return json_encode(array(
             'content' => $view->render($sourceFile, true),
             'name' => $view->getId(),
@@ -76,6 +78,13 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
      */
     protected function getRequest() {
         return $this->getApp()->getRequest();
+    }
+
+    /**
+     * @return \CClientScript
+     */
+    protected function getClientScript() {
+        return $this->getApp()->getComponent('clientScript');
     }
 
     /**
