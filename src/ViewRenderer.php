@@ -14,7 +14,9 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
     public $fileExtension = '.php';
     public $fileExtensionJs = '.js';
     public $scriptProcessorClass;
+    public $styleProcessorClass;
     private $scriptProcessor;
+    private $styleProcessor;
 
     public static function className() {
         return get_called_class();
@@ -64,6 +66,17 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
             $this->scriptProcessor = new $scriptProcessorClass();
         }
         return $this->scriptProcessor;
+    }
+
+    /**
+     * @return \PetrGrishin\View\ViewStyleProcessor
+     */
+    public function getStyleProcessor() {
+        if (empty($this->styleProcessor)) {
+            $styleProcessorClass = $this->styleProcessorClass ?: ViewStyleProcessor::className();
+            $this->styleProcessor = new $styleProcessorClass();
+        }
+        return $this->styleProcessor;
     }
 
     /**
