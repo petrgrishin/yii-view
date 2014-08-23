@@ -14,7 +14,7 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
     public $fileExtension = '.php';
     public $fileExtensionJs = '.js';
     public $scriptProcessorClass;
-    private $_scriptProcessor;
+    private $scriptProcessor;
 
     public static function className() {
         return get_called_class();
@@ -59,11 +59,11 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
      * @return \PetrGrishin\View\ViewScriptProcessor
      */
     public function getScriptProcessor() {
-        if (empty($this->_scriptProcessor)) {
+        if (empty($this->scriptProcessor)) {
             $scriptProcessorClass = $this->scriptProcessorClass ?: ViewScriptProcessor::className();
-            $this->_scriptProcessor = new $scriptProcessorClass();
+            $this->scriptProcessor = new $scriptProcessorClass();
         }
-        return $this->_scriptProcessor;
+        return $this->scriptProcessor;
     }
 
     /**
