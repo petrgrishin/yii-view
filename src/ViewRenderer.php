@@ -28,6 +28,7 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
         $isContextWidget = $this->isContextWidget($context) && $context->setView($view);
         $view->setParams($params);
         $view->setScriptFile($this->getScriptFile($sourceFile));
+        $view->setStylePath($this->getStylePath($sourceFile));
         if (!$isContextWidget && $this->isAjaxRequest()) {
             $response = $this->renderAjax($view, $sourceFile);
             $this->getScriptProcessor()->processView($view, true);
@@ -35,6 +36,7 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
             $response = $view->render($sourceFile, $isReturn);
             $this->getScriptProcessor()->processView($view);
         }
+        $this->getStyleProcessor()->processView($view);
         return $response;
     }
 
@@ -51,6 +53,12 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
 
     public function getScriptFile($sourceFile) {
         return $this->getBaseFilename($sourceFile) . $this->fileExtensionJs;
+    }
+
+    public function getStylePath($sourceFile) {
+        $baseFilename = $this->getBaseFilename($sourceFile);
+        $stylePath = end(explode('/', $baseFilename));
+        return sprintf('%s/%s', $baseFilename, $stylePath);
     }
 
     public function getBaseFilename($sourceFile) {

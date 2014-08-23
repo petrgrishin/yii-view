@@ -22,6 +22,8 @@ class View {
     protected $widgets = array();
     /** @var string */
     protected $scriptFile;
+    /** @var string */
+    protected $stylePath;
     /** @var \PetrGrishin\UniqueIdentifier\UniqueIdentifier */
     protected $uniqueIdentifier;
 
@@ -77,6 +79,15 @@ class View {
 
     public function setScriptFile($scriptFile) {
         $this->scriptFile = $scriptFile;
+        return $this;
+    }
+
+    public function getStylePath() {
+        return $this->stylePath;
+    }
+
+    public function setStylePath($stylePath) {
+        $this->stylePath = $stylePath;
         return $this;
     }
 

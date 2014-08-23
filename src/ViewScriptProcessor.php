@@ -84,14 +84,14 @@ class ViewScriptProcessor extends \CApplicationComponent {
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getPublicPath() {
         return $this->publicPath ?: \Yii::getPathOfAlias('webroot');
     }
 
     /**
-     * @param mixed $publicPath
+     * @param string $publicPath
      * @return $this
      */
     public function setPublicPath($publicPath) {
