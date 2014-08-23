@@ -11,6 +11,8 @@ use IViewRenderer;
 use PetrGrishin\Widget\Widget;
 
 class ViewRenderer extends CApplicationComponent implements IViewRenderer {
+    const PATH_STYLE = 'style';
+
     public $fileExtension = '.php';
     public $fileExtensionJs = '.js';
     public $scriptProcessorClass;
@@ -57,8 +59,7 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
 
     public function getStylePath($sourceFile) {
         $baseFilename = $this->getBaseFilename($sourceFile);
-        $stylePath = end(explode('/', $baseFilename));
-        return sprintf('%s/%s', $baseFilename, $stylePath);
+        return sprintf('%s/%s', $baseFilename, self::PATH_STYLE);
     }
 
     public function getBaseFilename($sourceFile) {
