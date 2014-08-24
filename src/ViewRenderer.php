@@ -50,6 +50,7 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
             'name' => $view->getId(),
             'params' => $view->getJsParams(),
             'dependents' => $this->getScriptProcessor()->getDependents($view),
+            'styles' => $this->getStyleProcessor()->getDependents($view),
         ));
     }
 

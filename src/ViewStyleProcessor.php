@@ -6,6 +6,8 @@
 namespace PetrGrishin\View;
 
 
+use PetrGrishin\Widget\Widget;
+
 class ViewStyleProcessor extends \CApplicationComponent {
     const FILENAME_STYLE = 'style.css';
 
@@ -19,6 +21,18 @@ class ViewStyleProcessor extends \CApplicationComponent {
     public function processView(View $view, $ajax = false) {
         $isAppend = $this->appendStyleFile($view->getId(), $view->getStylePath());
         return $this;
+    }
+
+    public function getDependents(View $view) {
+        $widgetsStyles = array();
+        foreach (array_reverse($view->getWidgets()) as $widgetClass => $widgets) {
+            /** @var Widget $widget */
+            foreach ($widgets as $widget) {
+                $widgetsStyles[] = $widget->getView()->getStylePath();
+                $widgetsStyles = array_merge($widgetsStyles, $this->getDependents($widget->getView()));
+            }
+        }
+        return array_unique($widgetsStyles);
     }
 
     public function getAssertPath() {
