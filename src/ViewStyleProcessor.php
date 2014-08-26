@@ -19,8 +19,11 @@ class ViewStyleProcessor extends \CApplicationComponent {
     }
 
     public function processView(View $view, $ajax = false) {
-        $isAppend = $this->appendStyleFile($view->getId(), $view->getStylePath());
-        return $this;
+        $assetPath = $this->prepareStyleFile($view->getStylePath());
+        if ($ajax) {
+           return;
+        }
+        $isAppend = $this->appendStyleFile($view->getId(), $assetPath);
     }
 
     public function getDependents(View $view) {
@@ -75,11 +78,15 @@ class ViewStyleProcessor extends \CApplicationComponent {
         return sprintf('/%s/%s', $this->getAssertPath(), $id);
     }
 
-    protected function appendStyleFile($id, $stylePath) {
+    protected function prepareStyleFile($stylePath) {
         if (!is_dir($stylePath)) {
             return false;
         }
         $assetPath = $this->getAssetManager()->publish($stylePath);
+        return $assetPath;
+    }
+
+    protected function appendStyleFile($id, $assetPath) {
         $script = sprintf("App.registerStyleFile('%s/%s');", $assetPath, self::FILENAME_STYLE);
         $this->getClientScript()->registerScript($id . '_style', $script, \CClientScript::POS_END);
         return true;
