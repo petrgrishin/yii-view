@@ -8,85 +8,65 @@ namespace PetrGrishin\View;
 
 use CApplicationComponent;
 use IViewRenderer;
+use PetrGrishin\View\ViewProcessor\HtmlViewProcessor;
+use PetrGrishin\View\ViewProcessor\ScriptViewProcessor;
+use PetrGrishin\View\ViewProcessor\StyleViewProcessor;
 use PetrGrishin\Widget\Widget;
 
 class ViewRenderer extends CApplicationComponent implements IViewRenderer {
-    const PATH_STYLE = 'style';
-
+    /** @var string */
     public $fileExtension = '.php';
-    public $fileExtensionJs = '.js';
-    public $scriptProcessorClass;
-    public $styleProcessorClass;
-    private $scriptProcessor;
-    private $styleProcessor;
+    /** @var  array */
+    private $viewProcessorsClasses;
 
     public static function className() {
         return get_called_class();
     }
 
     public function renderFile($context, $sourceFile, $params, $isReturn) {
-        $viewId = $this->generateViewId($sourceFile);
+        $templatePath = $this->resolveTemplatePath($sourceFile);
+        $viewId = $this->generateViewId($templatePath);
         $view = new View($viewId, $context);
-        $isContextWidget = $this->isContextWidget($context) && $context->setView($view);
+        $view->setTemplatePath($templatePath);
         $view->setParams($params);
-        $view->setScriptFile($this->getScriptFile($sourceFile));
-        $view->setStylePath($this->getStylePath($sourceFile));
-        if (!$isContextWidget && $this->isAjaxRequest()) {
-            $response = $this->renderAjax($view, $sourceFile);
-            $this->getScriptProcessor()->processView($view, true);
-        } else {
-            $response = $view->render($sourceFile, $isReturn);
-            $this->getScriptProcessor()->processView($view);
+        $isContextWidget = $this->isContextWidget($context) && $context->setView($view);
+        $isAjaxRequest = !$isContextWidget && $this->isAjaxRequest();
+        $responseParams = array();
+        foreach ($this->getViewProcessorsClasses() as $viewProcessorClass) {
+            /** @var \PetrGrishin\View\ViewProcessor\BaseViewProcessor $viewProcessor */
+            $viewProcessor = new $viewProcessorClass($view);
+            $viewProcessor->setIsAjaxMode($isAjaxRequest);
+            $viewProcessor->processView();
+            $responseParams = array_merge($responseParams, $viewProcessor->getParams());
         }
-        $this->getStyleProcessor()->processView($view);
-        return $response;
+        if ($isReturn) {
+             return $this->renderResponse($responseParams, $isAjaxRequest);
+        }
+        echo $this->renderResponse($responseParams, $isAjaxRequest);
     }
 
-    public function renderAjax(View $view, $sourceFile) {
+    protected function renderResponse(array $responseParams, $isAjaxRequest) {
+        if (!$isAjaxRequest) {
+            return $responseParams['content'];
+        }
         // todo: load scriptsFiles
         $this->getClientScript()->reset();
-        return json_encode(array(
-            'content' => $view->render($sourceFile, true),
-            'name' => $view->getId(),
-            'params' => $view->getJsParams(),
-            'dependents' => $this->getScriptProcessor()->getDependents($view),
-            'styles' => $this->getStyleProcessor()->getDependents($view),
-        ));
+        return json_encode($responseParams);
     }
 
-    public function getScriptFile($sourceFile) {
-        return $this->getBaseFilename($sourceFile) . $this->fileExtensionJs;
-    }
+//    public function renderAjax(View $view, $sourceFile) {
+//
+//        return json_encode(array(
+//            'content' => $view->provideContext($sourceFile, true),
+//            'name' => $view->getId(),
+//            'params' => $view->getJsParams(),
+//            'dependents' => $this->getScriptProcessor()->getDependents($view),
+//            'styles' => $this->getStyleProcessor()->getDependents($view),
+//        ));
+//    }
 
-    public function getStylePath($sourceFile) {
-        $baseFilename = $this->getBaseFilename($sourceFile);
-        return sprintf('%s/%s', $baseFilename, self::PATH_STYLE);
-    }
-
-    public function getBaseFilename($sourceFile) {
+    protected function resolveTemplatePath($sourceFile) {
         return substr($sourceFile, 0, - strlen($this->fileExtension));
-    }
-
-    /**
-     * @return \PetrGrishin\View\ViewScriptProcessor
-     */
-    public function getScriptProcessor() {
-        if (empty($this->scriptProcessor)) {
-            $scriptProcessorClass = $this->scriptProcessorClass ?: ViewScriptProcessor::className();
-            $this->scriptProcessor = new $scriptProcessorClass();
-        }
-        return $this->scriptProcessor;
-    }
-
-    /**
-     * @return \PetrGrishin\View\ViewStyleProcessor
-     */
-    public function getStyleProcessor() {
-        if (empty($this->styleProcessor)) {
-            $styleProcessorClass = $this->styleProcessorClass ?: ViewStyleProcessor::className();
-            $this->styleProcessor = new $styleProcessorClass();
-        }
-        return $this->styleProcessor;
     }
 
     /**
@@ -127,5 +107,25 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
      */
     protected function generateViewId($sourceFile) {
         return sprintf('%s', sha1($sourceFile));
+    }
+
+    /**
+     * @return array
+     */
+    public function getViewProcessorsClasses() {
+        return $this->viewProcessorsClasses ?: array(
+            HtmlViewProcessor::className(),
+            ScriptViewProcessor::className(),
+            StyleViewProcessor::className(),
+        );
+    }
+
+    /**
+     * @param array $viewProcessorsClasses
+     * @return $this
+     */
+    public function setViewProcessorsClasses(array $viewProcessorsClasses) {
+        $this->viewProcessorsClasses = $viewProcessorsClasses;
+        return $this;
     }
 }

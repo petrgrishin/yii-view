@@ -3,38 +3,41 @@
  * @author Petr Grishin <petr.grishin@grishini.ru>
  */
 
-namespace PetrGrishin\View;
+namespace PetrGrishin\View\ViewProcessor;
 
 
-use CClientScript;
+use PetrGrishin\View\View;
 use PetrGrishin\Widget\Widget;
 
-class ViewScriptProcessor extends \CApplicationComponent {
+class ScriptViewProcessor extends BaseViewProcessor {
+    const EXTENSION_SCRIPT = '.js';
     const MARKER_ID = '{{id}}';
 
     private $assertPath;
     private $publicPath;
 
-    public static function className() {
-        return get_called_class();
-    }
-
-    public function processView(View $view, $ajax = false) {
-        $widgetsIds = $this->getDependents($view);
-        $isAppend = $this->appendScriptFile($view->getId(), $view->getScriptFile());
-        if ($ajax) {
-            return;
+    public function processView() {
+        $scriptFile = sprintf('%s%s', $this->view->getTemplatePath(), self::EXTENSION_SCRIPT);
+        $widgetsIds = $this->getDependents($this->view);
+        $this->setParam('name', $this->view->getId());
+        $this->setParam('params', $this->view->getJsParams());
+        $this->setParam('dependents', $widgetsIds);
+        $isAppend = $this->appendScriptFile($this->view->getId(), $scriptFile);
+        if ($this->getIsAjaxMode()) {
+            return $this;
         }
-        $run = !$view->getContext() instanceof Widget;
-        $run && $isAppend && $this->runScript($view->getId(), $view->getJsParams() , $widgetsIds);
+        $run = !$this->view->getContext() instanceof Widget;
+        $run && $isAppend && $this->runScript($this->view->getId(), $this->view->getJsParams() , $widgetsIds);
+        return $this;
     }
 
-    public function getDependents(View $view) {
+    protected function getDependents(View $view) {
         $widgetsIds = array();
         foreach (array_reverse($view->getWidgets()) as $widgetClass => $widgets) {
             /** @var Widget $widget */
             foreach ($widgets as $widget) {
-                $isAppend = $this->appendScriptFile($widget->getView()->getId(), $widget->getView()->getScriptFile());
+                $scriptFile = sprintf('%s%s', $widget->getView()->getTemplatePath(), self::EXTENSION_SCRIPT);
+                $isAppend = $this->appendScriptFile($widget->getView()->getId(), $scriptFile);
                 $isAppend && $widgetsIds[$widget->getName()] = array(
                     'name' => $widget->getView()->getId(),
                     'params' => $widget->getView()->getJsParams(),
@@ -58,7 +61,7 @@ class ViewScriptProcessor extends \CApplicationComponent {
 
     public function runScript($id, $jsParams, $widgetsIds) {
         $script = sprintf("App.run('%s', %s, %s);", $id, json_encode($jsParams), json_encode($widgetsIds));
-        $this->getClientScript()->registerScript($id . '_run', $script, CClientScript::POS_END);
+        $this->getClientScript()->registerScript($id . '_run', $script, \CClientScript::POS_END);
     }
 
     protected function prepareScriptFile($id, $fileScript) {
@@ -111,7 +114,7 @@ class ViewScriptProcessor extends \CApplicationComponent {
     }
 
     /**
-     * @return CClientScript
+     * @return \CClientScript
      */
     protected function getClientScript() {
         return \Yii::app()->getComponent('clientScript');

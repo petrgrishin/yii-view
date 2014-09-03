@@ -20,10 +20,8 @@ class View {
     protected $context;
     /** @var array */
     protected $widgets = array();
-    /** @var string */
-    protected $scriptFile;
-    /** @var string */
-    protected $stylePath;
+    /** @var  string */
+    protected $templatePath;
     /** @var \PetrGrishin\UniqueIdentifier\UniqueIdentifier */
     protected $uniqueIdentifier;
 
@@ -44,6 +42,15 @@ class View {
 
     public function getContext() {
         return $this->context;
+    }
+
+    public function getTemplatePath() {
+        return $this->templatePath;
+    }
+
+    public function setTemplatePath($templatePath) {
+        $this->templatePath = $templatePath;
+        return $this;
     }
 
     public function getParams() {
@@ -73,24 +80,6 @@ class View {
         return $this;
     }
 
-    public function getScriptFile() {
-        return $this->scriptFile;
-    }
-
-    public function setScriptFile($scriptFile) {
-        $this->scriptFile = $scriptFile;
-        return $this;
-    }
-
-    public function getStylePath() {
-        return $this->stylePath;
-    }
-
-    public function setStylePath($stylePath) {
-        $this->stylePath = $stylePath;
-        return $this;
-    }
-
     public function widget($className, $name, $params = array()) {
         if (!array_key_exists($className, $this->widgets)) {
             $this->widgets[$className] = array();
@@ -117,15 +106,10 @@ class View {
         return $this->widgets;
     }
 
-    public function render($sourceFile, $return) {
-        if ($return) {
-            ob_start();
-            ob_implicit_flush(false);
-            require $sourceFile;
-            return ob_get_clean();
-        }
+    public function provideContext($sourceFile) {
+        ob_start();
+        ob_implicit_flush(false);
         require $sourceFile;
-        return null;
+        return ob_get_clean();
     }
 }
- 
