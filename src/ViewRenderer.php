@@ -54,17 +54,6 @@ class ViewRenderer extends CApplicationComponent implements IViewRenderer {
         return json_encode($responseParams);
     }
 
-//    public function renderAjax(View $view, $sourceFile) {
-//
-//        return json_encode(array(
-//            'content' => $view->provideContext($sourceFile, true),
-//            'name' => $view->getId(),
-//            'params' => $view->getJsParams(),
-//            'dependents' => $this->getScriptProcessor()->getDependents($view),
-//            'styles' => $this->getStyleProcessor()->getDependents($view),
-//        ));
-//    }
-
     protected function resolveTemplatePath($sourceFile) {
         return substr($sourceFile, 0, - strlen($this->fileExtension));
     }
