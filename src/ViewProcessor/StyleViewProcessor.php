@@ -34,7 +34,8 @@ class StyleViewProcessor extends BaseViewProcessor {
         foreach (array_reverse($view->getWidgets()) as $widgetClass => $widgets) {
             /** @var Widget $widget */
             foreach ($widgets as $widget) {
-                $widgetsStyles[] = $this->resolveStyleFile($widget->getView());
+                $styleFile = $this->resolveStyleFile($widget->getView());
+                $styleFile && ($widgetsStyles[] = $styleFile);
                 $widgetsStyles = array_merge($widgetsStyles, $this->getDependents($widget->getView()));
             }
         }
